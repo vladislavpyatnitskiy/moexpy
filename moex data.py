@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 
-def moex_data(x, s, e): # Moex Data
+def moex_data(x, s, e):
   
   if isinstance(x, str):
     x = [x]
@@ -21,12 +21,25 @@ def moex_data(x, s, e): # Moex Data
         "interval": 24
     }
     
-    data = requests.get(url, params=params).json()
+    all_rows = []
+    start = 0
     
-    columns = data["candles"]["columns"]
-    rows = data["candles"]["data"]
+    while True:
+      
+      params["start"] = start
+      r = requests.get(url, params=params)
+      data = r.json()
+      
+      columns = data["candles"]["columns"]
+      rows = data["candles"]["data"]
+      
+      if not rows:
+        break
+      
+      all_rows.extend(rows)
+      start += len(rows)
     
-    df = pd.DataFrame(rows, columns=columns)
+    df = pd.DataFrame(all_rows, columns=columns)
     
     df["Date"] = pd.to_datetime(df["begin"]).dt.date
     
