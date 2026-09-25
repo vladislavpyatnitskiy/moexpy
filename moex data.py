@@ -1,7 +1,8 @@
 import requests
 import pandas as pd
+from datetime import date
 
-def moex_data(x, s, e):
+def moex_data(x, s=None, e=None):
   
   if isinstance(x, str):
     x = [x]
@@ -14,6 +15,12 @@ def moex_data(x, s, e):
       f"https://iss.moex.com/iss/engines/stock/"
       f"markets/shares/securities/{ticker}/candles.json"
       )
+    
+    if s is None:
+      s = "2007-01-01"  
+      
+    if e is None:
+      e = date.today().isoformat()
       
     params = {
         "from": s,
@@ -50,4 +57,4 @@ def moex_data(x, s, e):
   
   return pd.concat(dfs, axis=1)
 
-moex_data(["SBER", "GAZP"], "2024-01-01", "2024-12-31")
+moex_data(["SBER", "GAZP"])
